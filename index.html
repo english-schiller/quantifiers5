@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Quantifiers - Happy Birthday! 🎉</title>
+<style>
+  /* ===== CSS VARIABLES & RESET ===== */
+  :root {
+    --bg:        #1a1035;
+    --surface:   #251947;
+    --card:      #2e2060;
+    --accent1:   #ff6b6b;
+    --accent2:   #ffd93d;
+    --accent3:   #6bcb77;
+    --accent4:   #4d96ff;
+    --accent5:   #c77dff;
+    --text:      #f0eaff;
+    --text-dim:  #a899cc;
+    --border:    rgba(255,255,255,0.10);
+    --radius:    16px;
+    --radius-sm: 10px;
+    --shadow:    0 8px 32px rgba(0,0,0,0.4);
+    --font-head: 'Georgia', serif;
+    --font-body: 'Trebuchet MS', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, #3d1f8a55 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, #8b1f5555 0%, transparent 50%);
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: linear-gradient(135deg, #2e1065 0%, #1e3a6e 100%);
+    padding: 24px 20px 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '🎉 🎂 🎈 🎁 🎊 🎀 🎉 🎂 🎈 🎁';
+    position: absolute;
+    top: 6px; left: 0; right: 0;
+    font-size: 18px;
+    opacity: 0.25;
+    letter-spacing: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  header h1 {
+    font-family: var(--font-head);
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    color: var(--accent2);
+    text-shadow: 0 2px 16px #ffd93d88;
+    letter-spacing: 1px;
+  }
+  header p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-top: 6px;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  #progress-bar-wrap {
+    background: var(--surface);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  #progress-label { font-size: 0.82rem; color: var(--text-dim); white-space: nowrap; }
+  #progress-track {
+    flex: 1;
+    height: 8px;
+    background: var(--card);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent4), var(--accent5));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  #step-indicator { font-size: 0.82rem; color: var(--text-dim); white-space: nowrap; }
+
+  /* ===== SECTIONS (SCREENS) ===== */
+  .screen { display: none; padding: 20px; max-width: 780px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 26px;
+    border-radius: 99px;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    touch-action: manipulation;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent4), var(--accent5));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(77,150,255,0.4);
+  }
+  .btn-primary:hover { box-shadow: 0 6px 24px rgba(77,150,255,0.6); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(46,204,113,0.4);
+  }
+  .btn-lg { padding: 16px 36px; font-size: 1.1rem; }
+  .btn-block { width: 100%; margin-top: 10px; }
+
+  /* ===== INDUCTION EXAMPLES ===== */
+  .example-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .bubble .en { color: var(--accent2); font-weight: bold; }
+  .bubble .de { color: var(--text-dim); font-size: 0.85rem; }
+  .highlight-q { color: var(--accent1); font-weight: bold; font-style: italic; }
+
+  /* ===== RULE BOX ===== */
+  .rule-box {
+    background: linear-gradient(135deg, #1a3a2a, #1a2a3a);
+    border: 1px solid var(--accent3);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 10px;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    display: none;
+  }
+  .rule-box.visible { display: block; }
+  .rule-box .rule-title {
+    color: var(--accent3);
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: bold;
+    margin: 2px;
+  }
+  .tag-pos  { background: #1e5c38; color: #6bcb77; }
+  .tag-neg  { background: #5c1e1e; color: #ff6b6b; }
+  .tag-q    { background: #1e3a5c; color: #4d96ff; }
+  .tag-count{ background: #3d2a5c; color: #c77dff; }
+  .tag-unc  { background: #5c3a1e; color: #ffd93d; }
+
+  /* ===== INDUCTION QUESTION ===== */
+  .induction-q {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin: 12px 0;
+  }
+  .induction-q p { font-size: 0.92rem; color: var(--text-dim); margin-bottom: 10px; }
+  .induction-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt-btn {
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    touch-action: manipulation;
+  }
+  .opt-btn:active { transform: scale(0.97); }
+  .opt-btn.correct { border-color: var(--accent3); background: #1e5c38; color: #6bcb77; }
+  .opt-btn.wrong   { border-color: var(--accent1); background: #5c1e1e; color: #ff6b6b; }
+
+  /* ===== OVERVIEW TABLE ===== */
+  .overview-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .overview-table th, .overview-table td {
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  .overview-table th { background: var(--surface); color: var(--accent2); }
+  .overview-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .overview-table td:first-child { color: var(--accent5); font-weight: bold; }
+
+  /* ===== LEVEL SELECTOR ===== */
+  .level-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+  }
+  .level-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.15s;
+    touch-action: manipulation;
+  }
+  .level-card:active { transform: scale(0.97); }
+  .level-card.selected { border-color: var(--accent4); background: #1a2e5c; }
+  .level-card .level-icon { font-size: 2.4rem; margin-bottom: 10px; }
+  .level-card .level-name { font-family: var(--font-head); color: var(--accent2); font-size: 1.05rem; margin-bottom: 6px; }
+  .level-card .level-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+  .level-card.lv1 { border-color: #6bcb7755; }
+  .level-card.lv2 { border-color: #4d96ff55; }
+  .level-card.lv3 { border-color: #c77dff55; }
+  .level-card.lv1.selected { border-color: #6bcb77; background: #1a3a28; }
+  .level-card.lv2.selected { border-color: #4d96ff; background: #1a2e5c; }
+  .level-card.lv3.selected { border-color: #c77dff; background: #2a1a5c; }
+
+  /* ===== EXERCISE AREA ===== */
+  #exercise-counter {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-align: right;
+    margin-bottom: 6px;
+  }
+  .ex-question {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ex-context {
+    background: var(--surface);
+    border-left: 4px solid var(--accent2);
+    padding: 10px 14px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    padding: 13px 18px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    touch-action: manipulation;
+  }
+  .choice-btn:active { transform: scale(0.99); }
+  .choice-btn.selected-ans { border-color: var(--accent4); background: #1a2e5c; }
+  .choice-btn.correct-ans  { border-color: var(--accent3); background: #1e5c38; color: #fff; }
+  .choice-btn.wrong-ans    { border-color: var(--accent1); background: #5c1e1e; color: #fff; }
+
+  /* Drag & Drop */
+  .drag-sentence { font-size: 1rem; line-height: 2.2; margin-bottom: 14px; }
+  .drop-zone {
+    display: inline-block;
+    min-width: 100px;
+    height: 36px;
+    border: 2px dashed var(--accent4);
+    border-radius: var(--radius-sm);
+    vertical-align: middle;
+    text-align: center;
+    line-height: 32px;
+    font-weight: bold;
+    color: var(--accent4);
+    background: rgba(77,150,255,0.08);
+    transition: background 0.2s, border-color 0.2s;
+    padding: 0 8px;
+  }
+  .drop-zone.filled { border-style: solid; border-color: var(--accent3); color: var(--accent3); background: rgba(107,203,119,0.1); }
+  .drop-zone.correct-drop { border-color: var(--accent3); background: #1e5c38; color: #fff; }
+  .drop-zone.wrong-drop   { border-color: var(--accent1); background: #5c1e1e; color: #fff; }
+  .drag-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    min-height: 56px;
+  }
+  .drag-token {
+    padding: 8px 16px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, var(--accent4), var(--accent5));
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform 0.15s, opacity 0.15s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+  .drag-token.dragging { opacity: 0.5; transform: scale(1.05); }
+  .drag-token.used { display: none; }
+
+  /* Feedback box */
+  .feedback-box {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback-box.visible { display: block; }
+  .feedback-box.correct { background: #1e5c38; border: 1px solid var(--accent3); color: #b8f0c5; }
+  .feedback-box.wrong   { background: #5c1e1e; border: 1px solid var(--accent1); color: #f0c5c5; }
+
+  /* Tip card */
+  .tip-btn {
+    background: none;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    margin-bottom: 10px;
+    touch-action: manipulation;
+  }
+  .tip-card {
+    background: #2a2000;
+    border: 1px solid #ffd93d55;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.87rem;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    display: none;
+    line-height: 1.6;
+  }
+  .tip-card.visible { display: block; }
+
+  /* ===== RESULTS SCREEN ===== */
+  .result-score {
+    font-family: var(--font-head);
+    font-size: 4rem;
+    text-align: center;
+    color: var(--accent2);
+    text-shadow: 0 0 32px #ffd93d88;
+    margin: 20px 0;
+  }
+  .result-bar-wrap { margin: 10px 0 20px; }
+  .result-bar-track {
+    height: 18px;
+    background: var(--card);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .result-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent4), var(--accent3));
+    border-radius: 99px;
+    transition: width 1s ease;
+  }
+  .result-stars { text-align: center; font-size: 2.4rem; margin: 10px 0; }
+  .confetti-line { text-align: center; font-size: 1.5rem; letter-spacing: 4px; margin: 8px 0; }
+
+  /* ===== NAVIGATION BUTTONS ===== */
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 500px) {
+    .level-cards { grid-template-columns: 1fr; }
+    .btn-lg { font-size: 1rem; padding: 14px 24px; }
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .screen.active { animation: fadeIn 0.35s ease both; }
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  .pop { animation: pop 0.25s ease; }
+
+  /* section title */
+  .section-label {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent4), var(--accent5));
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 10px;
+  }
+  .screen-title {
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    color: var(--accent2);
+    margin-bottom: 6px;
+  }
+  .screen-sub {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎂 Quantifiers - Happy Birthday!</h1>
+  <p>Unit 4 · Klasse 5 · Englisch</p>
+</header>
+
+<div id="progress-bar-wrap">
+  <span id="progress-label">Fortschritt</span>
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <span id="step-indicator">1 / 5</span>
+</div>
+
+<!-- ============================================================
+     SCREEN 0: WELCOME
+     ============================================================ -->
+<div class="screen active" id="screen-0">
+  <div class="section-label">Start</div>
+  <h2 class="screen-title">Party-Planung auf Englisch 🎈</h2>
+  <p class="screen-sub">
+    Lukas und Emma planen eine Geburtstagsparty. Beim Einkaufen müssen sie viel auf Englisch sagen -
+    zum Beispiel, ob sie <em>viel, wenig, ein paar</em> oder <em>etwas</em> von etwas brauchen.<br><br>
+    Auf dieser Seite entdeckst du die Regeln selbst - und übst sie danach in Aufgaben.
+  </p>
+
+  <div class="card">
+    <div class="card-title">📋 So läuft die Stunde ab</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem;">🔍</span>
+        <span><strong>Phase 1:</strong> Wiederholung - some/any &amp; much/many</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem;">🧩</span>
+        <span><strong>Phase 2:</strong> Neue Quantifiers entdecken - Regeln selbst erarbeiten</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem;">📊</span>
+        <span><strong>Phase 3:</strong> Übersicht - alle Regeln auf einen Blick</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem;">✏️</span>
+        <span><strong>Phase 4:</strong> Üben - du wählst deinen Schwierigkeitsgrad</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-primary btn-lg" id="btn-start">Los geht's! 🚀</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 1: REVIEW some/any & much/many
+     ============================================================ -->
+<div class="screen" id="screen-1">
+  <div class="section-label">Wiederholung</div>
+  <h2 class="screen-title">🔍 Erinnerst du dich?</h2>
+  <p class="screen-sub">
+    Schau dir die Sätze an. Finde heraus, wann welches Wort benutzt wird - und tippe dann deine Antwort.
+  </p>
+
+  <!-- some / any block -->
+  <div class="card">
+    <div class="card-title">🛒 some · any</div>
+    <div class="example-row">
+      <div class="bubble">
+        <div class="en">Let's buy <span class="highlight-q">some</span> balloons.</div>
+        <div class="de">Lass uns ein paar Luftballons kaufen.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">We need <span class="highlight-q">some</span> lemonade.</div>
+        <div class="de">Wir brauchen etwas Limonade.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">Do you have <span class="highlight-q">any</span> candles?</div>
+        <div class="de">Hast du Kerzen?</div>
+      </div>
+      <div class="bubble">
+        <div class="en">We don't have <span class="highlight-q">any</span> cups.</div>
+        <div class="de">Wir haben keine Becher.</div>
+      </div>
+    </div>
+
+    <div class="induction-q" id="iq-1">
+      <p>💬 <strong>Deine Aufgabe:</strong> Wann benutzt man <em>some</em>, wann <em>any</em>?</p>
+      <div class="induction-opts">
+        <button class="opt-btn" data-correct="false" data-group="iq1">some = Fragen und Verneinung</button>
+        <button class="opt-btn" data-correct="true"  data-group="iq1">some = bejahte Sätze / any = Fragen &amp; Verneinung</button>
+        <button class="opt-btn" data-correct="false" data-group="iq1">any = immer in positiven Sätzen</button>
+      </div>
+    </div>
+
+    <div class="rule-box" id="rule-1">
+      <div class="rule-title">✅ Regel: some · any</div>
+      <span class="tag tag-pos">✔ positiver Satz → <strong>some</strong></span>
+      <span class="tag tag-q">❓ Frage → <strong>any</strong></span>
+      <span class="tag tag-neg">✖ Verneinung → <strong>not any / no</strong></span>
+      <br><br>
+      <em>Vor zählbaren Pluralnomen</em> (balloons, candles) <em>und nicht zählbaren Nomen</em> (lemonade, time).
+    </div>
+  </div>
+
+  <!-- much / many block -->
+  <div class="card">
+    <div class="card-title">⚖️ much · many · a lot of</div>
+    <div class="example-row">
+      <div class="bubble">
+        <div class="en">How <span class="highlight-q">much</span> orange juice do we need?</div>
+        <div class="de">Wie viel Orangensaft brauchen wir?</div>
+      </div>
+      <div class="bubble">
+        <div class="en">We don't have <span class="highlight-q">much</span> time.</div>
+        <div class="de">Wir haben nicht viel Zeit.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">How <span class="highlight-q">many</span> guests are coming?</div>
+        <div class="de">Wie viele Gäste kommen?</div>
+      </div>
+      <div class="bubble">
+        <div class="en">There are <span class="highlight-q">a lot of</span> sweets.</div>
+        <div class="de">Es gibt viele Süßigkeiten.</div>
+      </div>
+    </div>
+
+    <div class="induction-q" id="iq-2">
+      <p>💬 <strong>Deine Aufgabe:</strong> Wie unterscheiden sich <em>much</em> und <em>many</em>?</p>
+      <div class="induction-opts">
+        <button class="opt-btn" data-correct="false" data-group="iq2">much = zählbare Nomen / many = nicht zählbare Nomen</button>
+        <button class="opt-btn" data-correct="true"  data-group="iq2">much = nicht zählbar (Singular) / many = zählbar (Plural)</button>
+        <button class="opt-btn" data-correct="false" data-group="iq2">much und many können immer ausgetauscht werden</button>
+      </div>
+    </div>
+
+    <div class="rule-box" id="rule-2">
+      <div class="rule-title">✅ Regel: much · many · a lot of</div>
+      <span class="tag tag-unc"><strong>much</strong> + nicht zählbar (Singular)</span>
+      <span class="tag tag-count"><strong>many</strong> + zählbar (Plural)</span>
+      <span class="tag tag-pos"><strong>a lot of / lots of</strong> + beides ✔ positiver Satz</span>
+      <br><br>
+      <em>much / many → v.a. in Fragen und verneinten Sätzen</em>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-1-back">← Zurück</button>
+    <button class="btn btn-primary" id="btn-1-next" disabled>Weiter →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 2: NEW QUANTIFIERS (Induction)
+     ============================================================ -->
+<div class="screen" id="screen-2">
+  <div class="section-label">Neu entdecken</div>
+  <h2 class="screen-title">🧩 Neue Mengenwörter entdecken</h2>
+  <p class="screen-sub">
+    Lukas und Emma sind beim Einkaufen. Lies ihre Sätze - und finde selbst die Regeln heraus!
+  </p>
+
+  <!-- a few / a couple of -->
+  <div class="card">
+    <div class="card-title">🎈 a few · a couple of</div>
+    <div class="example-row">
+      <div class="bubble">
+        <div class="en">Let's make <span class="highlight-q">a few</span> sandwiches.</div>
+        <div class="de">Lass uns ein paar Sandwiches machen.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">I invited <span class="highlight-q">a couple of</span> friends.</div>
+        <div class="de">Ich habe ein paar / zwei Freunde eingeladen.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">We need <span class="highlight-q">a few</span> more plates.</div>
+        <div class="de">Wir brauchen noch ein paar Teller.</div>
+      </div>
+    </div>
+
+    <div class="induction-q">
+      <p>💬 Was folgt nach <em>a few</em> und <em>a couple of</em>? Was steckt dahinter?</p>
+      <div class="induction-opts">
+        <button class="opt-btn" data-correct="false" data-group="iq3">nicht zählbare Nomen im Singular</button>
+        <button class="opt-btn" data-correct="true"  data-group="iq3">zählbare Nomen im Plural → bedeutet „ein paar"</button>
+        <button class="opt-btn" data-correct="false" data-group="iq3">Es spielt keine Rolle, welches Nomen folgt</button>
+      </div>
+    </div>
+
+    <div class="rule-box" id="rule-3">
+      <div class="rule-title">✅ Regel: a few · a couple of</div>
+      <span class="tag tag-count"><strong>a few</strong> + zählbar (Plural) = ein paar</span>
+      <span class="tag tag-count"><strong>a couple of</strong> + zählbar (Plural) = ein paar / zwei</span>
+      <br><br>
+      <em>a couple of</em> kann genau „zwei" bedeuten (z.B. zwei Freunde).<br>
+      In verkürzten Antworten: <strong>A few. / A couple.</strong> (ohne Nomen und ohne „of")
+    </div>
+  </div>
+
+  <!-- a little -->
+  <div class="card">
+    <div class="card-title">🥤 a little</div>
+    <div class="example-row">
+      <div class="bubble">
+        <div class="en">Emma, I need <span class="highlight-q">a little</span> help.</div>
+        <div class="de">Emma, ich brauche ein bisschen Hilfe.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">We only have <span class="highlight-q">a little</span> lemonade left.</div>
+        <div class="de">Wir haben nur noch ein bisschen Limonade.</div>
+      </div>
+      <div class="bubble">
+        <div class="en">Can you add <span class="highlight-q">a little</span> sugar?</div>
+        <div class="de">Kannst du etwas Zucker hinzugeben?</div>
+      </div>
+    </div>
+
+    <div class="induction-q">
+      <p>💬 Was folgt nach <em>a little</em> - und was bedeutet es?</p>
+      <div class="induction-opts">
+        <button class="opt-btn" data-correct="false" data-group="iq4">zählbare Nomen im Plural → „viele"</button>
+        <button class="opt-btn" data-correct="false" data-group="iq4">zählbare Nomen im Singular → „ein bisschen"</button>
+        <button class="opt-btn" data-correct="true"  data-group="iq4">nicht zählbare Nomen (Singular) → „ein bisschen / etwas"</button>
+      </div>
+    </div>
+
+    <div class="rule-box" id="rule-4">
+      <div class="rule-title">✅ Regel: a little</div>
+      <span class="tag tag-unc"><strong>a little</strong> + nicht zählbar (Singular) = ein bisschen</span>
+      <br><br>
+      In verkürzten Antworten: <strong>A little.</strong> (ohne Nomen)
+    </div>
+  </div>
+
+  <!-- expressions of quantity with of -->
+  <div class="card">
+    <div class="card-title">🛍️ Expressions of quantity with <em>of</em></div>
+    <div class="example-row">
+      <div class="bubble">
+        <div class="en">We need <span class="highlight-q">a bottle of</span> lemonade.</div>
+        <div class="de">eine Flasche Limonade</div>
+      </div>
+      <div class="bubble">
+        <div class="en">Let's buy <span class="highlight-q">two bags of</span> sweets.</div>
+        <div class="de">zwei Tüten Bonbons</div>
+      </div>
+      <div class="bubble">
+        <div class="en">I'll get <span class="highlight-q">a packet of</span> biscuits.</div>
+        <div class="de">eine Packung Kekse</div>
+      </div>
+      <div class="bubble">
+        <div class="en">Can you pour me <span class="highlight-q">a glass of</span> juice?</div>
+        <div class="de">ein Glas Saft</div>
+      </div>
+    </div>
+
+    <div class="induction-q">
+      <p>💬 Was haben alle diese Ausdrücke gemeinsam? Wofür benutzt man sie?</p>
+      <div class="induction-opts">
+        <button class="opt-btn" data-correct="false" data-group="iq5">Man benutzt sie nur bei zählbaren Nomen</button>
+        <button class="opt-btn" data-correct="true"  data-group="iq5">Behälter/Verpackung + <em>of</em> = genaue Menge angeben (bei zählbar und nicht zählbar)</button>
+        <button class="opt-btn" data-correct="false" data-group="iq5">Man schreibt nie eine Zahl davor</button>
+      </div>
+    </div>
+
+    <div class="rule-box" id="rule-5">
+      <div class="rule-title">✅ Regel: expressions of quantity</div>
+      Behältnis / Verpackung / Maßangabe + <strong>of</strong> + Nomen<br><br>
+      <em>a bottle of</em> water &nbsp;|&nbsp; <em>two bags of</em> sweets &nbsp;|&nbsp; <em>a glass of</em> juice<br><br>
+      Funktioniert mit zählbaren <em>und</em> nicht zählbaren Nomen.
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-2-back">← Zurück</button>
+    <button class="btn btn-primary" id="btn-2-next" disabled>Weiter →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 3: OVERVIEW TABLE
+     ============================================================ -->
+<div class="screen" id="screen-3">
+  <div class="section-label">Übersicht</div>
+  <h2 class="screen-title">📊 Alle Quantifiers auf einen Blick</h2>
+  <p class="screen-sub">Hier siehst du alle Regeln zusammengefasst. Du kannst diese Seite jederzeit wieder aufrufen!</p>
+
+  <div class="card">
+    <table class="overview-table">
+      <thead>
+        <tr>
+          <th>Quantifier</th>
+          <th>Nomen-Typ</th>
+          <th>Satztyp</th>
+          <th>Bedeutung</th>
+          <th>Beispiel</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>some</td>
+          <td>zählbar (Pl.) <br>nicht zählbar</td>
+          <td><span class="tag tag-pos">+ positiv</span></td>
+          <td>ein paar / etwas</td>
+          <td><em>some balloons / some juice</em></td>
+        </tr>
+        <tr>
+          <td>any</td>
+          <td>zählbar (Pl.) <br>nicht zählbar</td>
+          <td><span class="tag tag-q">? Frage</span> <span class="tag tag-neg">✖ negativ</span></td>
+          <td>irgendwelche / (kein-)</td>
+          <td><em>any candles? / not any cups</em></td>
+        </tr>
+        <tr>
+          <td>no</td>
+          <td>beides</td>
+          <td><span class="tag tag-neg">✖ negativ</span></td>
+          <td>kein/keine</td>
+          <td><em>no time / no cups</em></td>
+        </tr>
+        <tr>
+          <td>much</td>
+          <td>nicht zählbar (Sg.)</td>
+          <td><span class="tag tag-q">? Frage</span> <span class="tag tag-neg">✖ negativ</span></td>
+          <td>viel</td>
+          <td><em>much juice / much time</em></td>
+        </tr>
+        <tr>
+          <td>many</td>
+          <td>zählbar (Pl.)</td>
+          <td><span class="tag tag-q">? Frage</span> <span class="tag tag-neg">✖ negativ</span></td>
+          <td>viele</td>
+          <td><em>many guests / many cups</em></td>
+        </tr>
+        <tr>
+          <td>a lot of / lots of</td>
+          <td>beides</td>
+          <td><span class="tag tag-pos">+ positiv</span></td>
+          <td>viel / viele</td>
+          <td><em>a lot of juice / a lot of guests</em></td>
+        </tr>
+        <tr>
+          <td>a few</td>
+          <td>zählbar (Pl.)</td>
+          <td>alle</td>
+          <td>ein paar</td>
+          <td><em>a few sandwiches</em></td>
+        </tr>
+        <tr>
+          <td>a couple of</td>
+          <td>zählbar (Pl.)</td>
+          <td>alle</td>
+          <td>ein paar / zwei</td>
+          <td><em>a couple of friends</em></td>
+        </tr>
+        <tr>
+          <td>a little</td>
+          <td>nicht zählbar (Sg.)</td>
+          <td>alle</td>
+          <td>ein bisschen</td>
+          <td><em>a little sugar / a little help</em></td>
+        </tr>
+        <tr>
+          <td>[Behältnis] of</td>
+          <td>beides</td>
+          <td>alle</td>
+          <td>genaue Menge</td>
+          <td><em>a bottle of water, two bags of sweets</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-3-back">← Zurück</button>
+    <button class="btn btn-primary btn-lg" id="btn-3-next">Zum Üben →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 4: LEVEL SELECTION
+     ============================================================ -->
+<div class="screen" id="screen-4">
+  <div class="section-label">Aufgaben</div>
+  <h2 class="screen-title">✏️ Jetzt üben - wähle deinen Level!</h2>
+  <p class="screen-sub">
+    Überleg kurz: Wie sicher fühlst du dich schon mit den Quantifiers?<br>
+    Wähle den passenden Level - du kannst danach immer noch wechseln.
+  </p>
+
+  <div class="level-cards">
+    <div class="level-card lv1" data-level="1">
+      <div class="level-icon">🟢</div>
+      <div class="level-name">Level 1 - Starter</div>
+      <div class="level-desc">
+        Multiple Choice:<br>
+        Wähle den richtigen Quantifier aus vorgegebenen Antworten.<br>
+        + Tipps verfügbar!
+      </div>
+    </div>
+    <div class="level-card lv2" data-level="2">
+      <div class="level-icon">🔵</div>
+      <div class="level-name">Level 2 - Explorer</div>
+      <div class="level-desc">
+        Drag &amp; Drop:<br>
+        Ziehe den richtigen Quantifier in die Lücke.<br>
+        Mehrere Sätze auf einmal!
+      </div>
+    </div>
+    <div class="level-card lv3" data-level="3">
+      <div class="level-icon">🟣</div>
+      <div class="level-name">Level 3 - Challenge</div>
+      <div class="level-desc">
+        Mix aus allem:<br>
+        Harder Kontext, kreativere Aufgaben, weniger Hilfe.
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-4-back">← Zurück</button>
+    <button class="btn btn-primary btn-lg" id="btn-4-next" disabled>Aufgaben starten →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 5: EXERCISES
+     ============================================================ -->
+<div class="screen" id="screen-5">
+  <div class="section-label">Übungen</div>
+  <h2 class="screen-title" id="exercise-level-title">Level 1 - Starter</h2>
+  <div id="exercise-counter"></div>
+
+  <div class="card" id="exercise-card">
+    <!-- Dynamically filled -->
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-ex-back">← Level wechseln</button>
+    <button class="btn btn-primary" id="btn-ex-check" disabled>Antwort prüfen ✓</button>
+    <button class="btn btn-primary" id="btn-ex-next" style="display:none;">Nächste Aufgabe →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 6: RESULTS
+     ============================================================ -->
+<div class="screen" id="screen-6">
+  <div class="section-label">Ergebnis</div>
+  <h2 class="screen-title" style="text-align:center;">🎉 Fertig!</h2>
+
+  <div class="card" style="text-align:center;">
+    <div class="result-score" id="result-score">0/0</div>
+    <div class="result-bar-wrap">
+      <div class="result-bar-track">
+        <div class="result-bar-fill" id="result-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="result-stars" id="result-stars">⭐</div>
+    <div id="result-msg" style="color:var(--text-dim);font-size:0.95rem;line-height:1.7;"></div>
+  </div>
+
+  <div class="confetti-line">🎈 🎂 🎉 🎊 🎁 🎀</div>
+
+  <div class="nav-row" style="justify-content:center;flex-direction:column;align-items:center;gap:14px;">
+    <button class="btn btn-primary btn-lg" id="btn-retry">Nochmal versuchen 🔄</button>
+    <button class="btn btn-secondary" id="btn-change-level">Anderen Level wählen</button>
+    <button class="btn btn-secondary" id="btn-overview">Zur Regelübersicht</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA - alle Aufgaben als JS-Arrays
+   ============================================================ */
+
+// -- Level 1: Multiple Choice ----------------------------------
+const exercisesL1 = [
+  {
+    type: "mc",
+    context: "Lukas und Emma sind im Supermarkt und schreiben einen Einkaufszettel.",
+    question: "We need _____ lemonade for the party.",
+    choices: ["some", "any", "many", "much"],
+    correct: 0, // index
+    tip: "Lemonade ist nicht zählbar. Der Satz ist positiv.",
+    explanation: "<strong>some</strong> steht in positiven Aussagesätzen vor zählbaren und nicht zählbaren Nomen."
+  },
+  {
+    type: "mc",
+    context: "Emma fragt im Laden nach.",
+    question: "Do you have _____ birthday candles?",
+    choices: ["some", "any", "many", "much"],
+    correct: 1,
+    tip: "Der Satz ist eine Frage!",
+    explanation: "<strong>any</strong> steht in Fragen und verneinten Sätzen."
+  },
+  {
+    type: "mc",
+    context: "Die Party ist morgen - es gibt ein Problem.",
+    question: "We don't have _____ time to bake the cake!",
+    choices: ["many", "a few", "much", "some"],
+    correct: 2,
+    tip: "Time ist nicht zählbar. Der Satz ist negativ.",
+    explanation: "<strong>much</strong> steht vor nicht zählbaren Nomen in Fragen und Verneinungen."
+  },
+  {
+    type: "mc",
+    context: "Lukas schaut in die Vorratskammer.",
+    question: "We still have _____ plates - about twelve.",
+    choices: ["a little", "much", "a lot of", "any"],
+    correct: 2,
+    tip: "Plates sind zählbar. Der Satz ist positiv und die Menge ist groß.",
+    explanation: "<strong>a lot of</strong> steht in positiven Sätzen für große Mengen (zählbar und nicht zählbar)."
+  },
+  {
+    type: "mc",
+    context: "Emma möchte nur ein klitzekleines Stück.",
+    question: "Can I have _____ cake, please?",
+    choices: ["a few", "a couple of", "a little", "many"],
+    correct: 2,
+    tip: "Cake ist hier nicht zählbar (eine unbestimmte Menge). Es geht um ein bisschen.",
+    explanation: "<strong>a little</strong> steht vor nicht zählbaren Nomen und bedeutet 'ein bisschen'."
+  },
+  {
+    type: "mc",
+    context: "Lukas hat Freunde eingeladen.",
+    question: "I invited _____ friends - just Tom and Max.",
+    choices: ["a little", "much", "a couple of", "many"],
+    correct: 2,
+    tip: "Es geht um genau zwei Personen. Friends ist zählbar.",
+    explanation: "<strong>a couple of</strong> bedeutet 'ein paar' oder genau 'zwei' - vor zählbaren Nomen im Plural."
+  },
+  {
+    type: "mc",
+    context: "Die Mädels machen Sandwiches.",
+    question: "Let's make _____ sandwiches for everyone.",
+    choices: ["a little", "much", "any", "a few"],
+    correct: 3,
+    tip: "Sandwiches sind zählbar. Es geht um 'ein paar'.",
+    explanation: "<strong>a few</strong> bedeutet 'ein paar' und steht vor zählbaren Nomen im Plural."
+  },
+  {
+    type: "mc",
+    context: "Emma kauft Getränke.",
+    question: "She buys _____ orange juice.",
+    choices: ["a bottle of", "many", "a few", "any"],
+    correct: 0,
+    tip: "Hier wird eine Verpackungseinheit (Behältnis) angegeben.",
+    explanation: "Behältnis/Verpackung + <strong>of</strong> + Nomen: <em>a bottle of</em> orange juice."
+  }
+];
+
+// -- Level 2: Drag & Drop --------------------------------------
+const exercisesL2 = [
+  {
+    type: "drag",
+    context: "Party-Einkauf: Zieht die richtigen Wörter in die Lücken.",
+    sentences: [
+      { before: "We need", after: "balloons for the party.", answer: "some", id: "dz1" },
+      { before: "Do you have", after: "cups left?", answer: "any", id: "dz2" },
+      { before: "I only have", after: "money with me.", answer: "a little", id: "dz3" },
+      { before: "Let's buy", after: "packets of crisps.", answer: "a few", id: "dz4" }
+    ],
+    pool: ["some", "any", "a little", "a few", "much", "many"]
+  },
+  {
+    type: "drag",
+    context: "Beim Backen des Kuchens braucht Emma Hilfe.",
+    sentences: [
+      { before: "We don't have", after: "sugar. We need to buy some!", answer: "much", id: "dz5" },
+      { before: "How", after: "eggs do we need for the cake?", answer: "many", id: "dz6" },
+      { before: "We have", after: "flour left - great!", answer: "a lot of", id: "dz7" },
+      { before: "I invited", after: "friends - just two of them.", answer: "a couple of", id: "dz8" }
+    ],
+    pool: ["much", "many", "a lot of", "a couple of", "a little", "some"]
+  },
+  {
+    type: "drag",
+    context: "Der Laden hat alles - aber sind das die richtigen Mengenangaben?",
+    sentences: [
+      { before: "Please get", after: "milk.", answer: "a bottle of", id: "dz9" },
+      { before: "We need", after: "sweets for the party bags.", answer: "two bags of", id: "dz10" },
+      { before: "Can you pour me", after: "juice?", answer: "a glass of", id: "dz11" }
+    ],
+    pool: ["a bottle of", "two bags of", "a glass of", "a packet of", "a few", "some"]
+  }
+];
+
+// -- Level 3: Challenge Mix ------------------------------------
+const exercisesL3 = [
+  {
+    type: "mc",
+    context: "Lies den Dialog und wähle die richtige Antwort.",
+    question: "Emma: 'How much lemonade is left?' - Lukas: '_____.'\n(Bedeutung: nicht viel)",
+    choices: ["Not many.", "Not much.", "A few.", "A lot."],
+    correct: 1,
+    tip: "Lemonade ist nicht zählbar. Verkürzte Antwort mit 'not much'.",
+    explanation: "Verkürzte Antwort: <strong>Not much.</strong> (= We don't have much lemonade.)"
+  },
+  {
+    type: "mc",
+    context: "Kontext: Jemand fragt nach Gästen.",
+    question: "'How many guests are coming?' - '_____' (Bedeutung: viele!)",
+    choices: ["Not much.", "A little.", "A lot!", "Any."],
+    correct: 2,
+    tip: "Guests sind zählbar. Verkürzte positive Antwort.",
+    explanation: "Verkürzte Antwort: <strong>A lot!</strong> (= I have a lot of guests coming.)"
+  },
+  {
+    type: "mc",
+    context: "Grammatik-Challenge: Welcher Satz ist KORREKT?",
+    question: "Welcher Satz ist grammatikalisch korrekt?",
+    choices: [
+      "We have a little friends at the party.",
+      "We don't have many time.",
+      "She bought a packet of biscuits.",
+      "Do you have some candles?"
+    ],
+    correct: 2,
+    tip: "Überprüfe jeden Satz: Passt der Quantifier zum Nomen-Typ und Satztyp?",
+    explanation: "<em>a packet of biscuits</em> ist korrekt (Behältnis + of + Nomen). <br>[X] <em>a little friends</em> - friends ist zählbar -> a few. <br>[X] <em>many time</em> - time ist nicht zählbar -> much. <br>[X] <em>some candles</em> in einer Frage -> any."
+  },
+  {
+    type: "mc",
+    context: "Transfer-Aufgabe: Übersetze den deutschen Satz.",
+    question: "Wir haben noch ein paar Kerzen zu Hause. -> Auf Englisch?",
+    choices: [
+      "We still have a little candles at home.",
+      "We still have a few candles at home.",
+      "We still have much candles at home.",
+      "We still have any candles at home."
+    ],
+    correct: 1,
+    tip: "Candles sind zählbar. 'Ein paar' = ?",
+    explanation: "<strong>a few</strong> = ein paar, vor zählbaren Nomen im Plural."
+  },
+  {
+    type: "mc",
+    context: "Einkaufszettel - was fehlt?",
+    question: "Lukas schreibt: 'Buy _____ orange juice, _____ apples and _____ chocolate.' Was passt?",
+    choices: [
+      "a bottle of  /  a few  /  a bar of",
+      "a little  /  many  /  some",
+      "a few  /  a bottle of  /  much",
+      "any  /  a little  /  many"
+    ],
+    correct: 0,
+    tip: "Orange juice -> Behältnis. Apples -> zählbar. Chocolate -> nicht zählbar (Behältnis).",
+    explanation: "<em>a bottle of</em> orange juice | <em>a few</em> apples | <em>a bar of</em> chocolate - alles Behältnis/Mengenwörter, passend zu zählbar/nicht zählbar."
+  },
+  {
+    type: "mc",
+    context: "Fehler finden!",
+    question: "Emma sagt: 'I don't have many sugar.' Was ist falsch?",
+    choices: [
+      "don't - es muss 'doesn't' heißen",
+      "many - es muss 'much' heißen, weil sugar nicht zählbar ist",
+      "sugar - es muss 'sugars' heißen",
+      "Nichts ist falsch"
+    ],
+    correct: 1,
+    tip: "Ist sugar zählbar oder nicht zählbar?",
+    explanation: "<strong>sugar</strong> ist nicht zählbar -> <strong>much</strong> (nicht many): <em>I don't have much sugar.</em>"
+  }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  screen: 0,
+  totalScreens: 7, // 0..6
+  level: null,
+  // induction progress
+  inductionAnswered: { iq1: false, iq2: false, iq3: false, iq4: false, iq5: false },
+  reviewDone: false,
+  newDone: false,
+  // exercise state
+  exercises: [],
+  exIdx: 0,
+  score: 0,
+  answered: false,
+  // drag state
+  dragActive: null, // token being dragged (touch)
+  dropAnswers: {},  // id -> chosen word
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function $(id) { return document.getElementById(id); }
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + n).classList.add('active');
+  state.screen = n;
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProgress() {
+  const fill = $('progress-fill');
+  const ind  = $('step-indicator');
+  const pct  = Math.round((state.screen / (state.totalScreens - 1)) * 100);
+  fill.style.width = pct + '%';
+  const labels = ['Start', 'Wiederholung', 'Neu entdecken', 'Übersicht', 'Level wählen', 'Üben', 'Ergebnis'];
+  ind.textContent = labels[state.screen] || '';
+}
+
+/* ============================================================
+   INDUCTION BUTTONS - shared handler
+   ============================================================ */
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.opt-btn');
+  if (!btn) return;
+  const group = btn.dataset.group;
+  if (!group) return;
+  // disable all in group
+  document.querySelectorAll(`.opt-btn[data-group="${group}"]`).forEach(b => {
+    b.classList.remove('correct', 'wrong');
+    b.disabled = true;
+  });
+  const isCorrect = btn.dataset.correct === 'true';
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // if wrong, show correct one
+  if (!isCorrect) {
+    document.querySelectorAll(`.opt-btn[data-group="${group}"]`).forEach(b => {
+      if (b.dataset.correct === 'true') b.classList.add('correct');
+    });
+  }
+
+  // mark answered
+  state.inductionAnswered[group] = true;
+
+  // show rule box
+  const ruleMap = { iq1: 'rule-1', iq2: 'rule-2', iq3: 'rule-3', iq4: 'rule-4', iq5: 'rule-5' };
+  if (ruleMap[group]) {
+    const rb = $(ruleMap[group]);
+    if (rb) { rb.classList.add('visible'); }
+  }
+
+  // check if screen can advance
+  checkReviewDone();
+  checkNewDone();
+});
+
+function checkReviewDone() {
+  if (state.inductionAnswered['iq1'] && state.inductionAnswered['iq2']) {
+    $('btn-1-next').disabled = false;
+  }
+}
+function checkNewDone() {
+  if (state.inductionAnswered['iq3'] && state.inductionAnswered['iq4'] && state.inductionAnswered['iq5']) {
+    $('btn-2-next').disabled = false;
+  }
+}
+
+/* ============================================================
+   NAV BUTTONS
+   ============================================================ */
+$('btn-start').addEventListener('click', () => showScreen(1));
+$('btn-1-back').addEventListener('click', () => showScreen(0));
+$('btn-1-next').addEventListener('click', () => showScreen(2));
+$('btn-2-back').addEventListener('click', () => showScreen(1));
+$('btn-2-next').addEventListener('click', () => showScreen(3));
+$('btn-3-back').addEventListener('click', () => showScreen(2));
+$('btn-3-next').addEventListener('click', () => showScreen(4));
+$('btn-4-back').addEventListener('click', () => showScreen(3));
+$('btn-4-next').addEventListener('click', () => {
+  startExercises();
+  showScreen(5);
+});
+$('btn-ex-back').addEventListener('click', () => showScreen(4));
+$('btn-ex-check').addEventListener('click', checkAnswer);
+$('btn-ex-next').addEventListener('click', nextExercise);
+$('btn-retry').addEventListener('click', () => {
+  startExercises();
+  showScreen(5);
+});
+$('btn-change-level').addEventListener('click', () => {
+  state.level = null;
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  $('btn-4-next').disabled = true;
+  showScreen(4);
+});
+$('btn-overview').addEventListener('click', () => showScreen(3));
+
+/* ============================================================
+   LEVEL SELECTION
+   ============================================================ */
+document.querySelectorAll('.level-card').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+    this.classList.add('selected');
+    state.level = parseInt(this.dataset.level);
+    $('btn-4-next').disabled = false;
+  });
+});
+
+/* ============================================================
+   EXERCISE ENGINE
+   ============================================================ */
+function startExercises() {
+  if (state.level === 1) state.exercises = shuffle([...exercisesL1]);
+  else if (state.level === 2) state.exercises = [...exercisesL2];
+  else state.exercises = shuffle([...exercisesL3]);
+
+  state.exIdx = 0;
+  state.score = 0;
+
+  const titles = { 1: '[GR] Level 1 - Starter', 2: '[BL] Level 2 - Explorer', 3: '[PU] Level 3 - Challenge' };
+  $('exercise-level-title').textContent = titles[state.level];
+  renderExercise();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderExercise() {
+  const ex = state.exercises[state.exIdx];
+  state.answered = false;
+  state.dropAnswers = {};
+
+  $('exercise-counter').textContent =
+    `Aufgabe ${state.exIdx + 1} von ${state.exercises.length}`;
+
+  $('btn-ex-check').style.display = 'inline-flex';
+  $('btn-ex-check').disabled = true;
+  $('btn-ex-next').style.display = 'none';
+
+  if (ex.type === 'mc') renderMC(ex);
+  else if (ex.type === 'drag') renderDrag(ex);
+}
+
+// -- Multiple Choice ------------------------------------------
+function renderMC(ex) {
+  let html = '';
+
+  if (state.level === 1) {
+    // show tip button for level 1
+    html += `<button class="tip-btn" id="tip-toggle">[!] Tipp anzeigen</button>
+             <div class="tip-card" id="tip-card">${ex.tip}</div>`;
+  }
+
+  if (ex.context) html += `<div class="ex-context">[>] ${ex.context}</div>`;
+  html += `<div class="ex-question">${ex.question.replace(/\n/g, '<br>')}</div>`;
+  html += '<div class="choices">';
+  ex.choices.forEach((ch, i) => {
+    html += `<button class="choice-btn" data-idx="${i}">${ch}</button>`;
+  });
+  html += '</div>';
+  html += '<div class="feedback-box" id="fb"></div>';
+
+  $('exercise-card').innerHTML = html;
+
+  // tip toggle
+  const tipBtn = $('tip-toggle');
+  if (tipBtn) {
+    tipBtn.addEventListener('click', function() {
+      const card = $('tip-card');
+      card.classList.toggle('visible');
+      this.textContent = card.classList.contains('visible') ? '[!] Tipp verbergen' : '[!] Tipp anzeigen';
+    });
+  }
+
+  // choices
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (state.answered) return;
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected-ans'));
+      this.classList.add('selected-ans');
+      $('btn-ex-check').disabled = false;
+      state.selectedIdx = parseInt(this.dataset.idx);
+    });
+  });
+}
+
+function checkMCAnswer(ex) {
+  const selected = state.selectedIdx;
+  document.querySelectorAll('.choice-btn').forEach((btn, i) => {
+    if (i === ex.correct) btn.classList.add('correct-ans');
+    else if (i === selected && selected !== ex.correct) btn.classList.add('wrong-ans');
+    btn.disabled = true;
+  });
+  const fb = $('fb');
+  fb.classList.add('visible');
+  if (selected === ex.correct) {
+    state.score++;
+    fb.classList.add('correct');
+    fb.innerHTML = '[OK] <strong>Richtig!</strong> ' + ex.explanation;
+  } else {
+    fb.classList.add('wrong');
+    fb.innerHTML = '[X] <strong>Leider falsch.</strong> ' + ex.explanation;
+  }
+}
+
+// -- Drag & Drop ----------------------------------------------
+function renderDrag(ex) {
+  let html = '';
+  if (ex.context) html += `<div class="ex-context">[>] ${ex.context}</div>`;
+
+  // pool
+  html += '<div class="drag-pool" id="drag-pool">';
+  ex.pool.forEach((word, wi) => {
+    html += `<div class="drag-token" data-word="${word}" data-wi="${wi}" id="tok-${wi}">${word}</div>`;
+  });
+  html += '</div>';
+
+  // sentences
+  html += '<div class="drag-sentences">';
+  ex.sentences.forEach(s => {
+    html += `<div class="drag-sentence">
+      ${s.before} <span class="drop-zone" id="${s.id}" data-answer="${s.answer}">___</span> ${s.after}
+    </div>`;
+  });
+  html += '</div>';
+
+  html += '<div class="feedback-box" id="fb"></div>';
+  $('exercise-card').innerHTML = html;
+
+  setupDragAndDrop(ex);
+  $('btn-ex-check').disabled = false; // allow early check
+}
+
+function setupDragAndDrop(ex) {
+  const tokens = document.querySelectorAll('.drag-token');
+  const zones  = document.querySelectorAll('.drop-zone');
+
+  // -- Mouse Drag --
+  tokens.forEach(tok => {
+    tok.setAttribute('draggable', 'true');
+    tok.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('word', this.dataset.word);
+      e.dataTransfer.setData('wi', this.dataset.wi);
+      this.classList.add('dragging');
+    });
+    tok.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+    });
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      const word = e.dataTransfer.getData('word');
+      const wi   = e.dataTransfer.getData('wi');
+      // return previous token to pool if zone was filled
+      returnTokenFromZone(this);
+      // fill zone
+      this.textContent = word;
+      this.classList.add('filled');
+      this.dataset.chosen = word;
+      this.dataset.wi = wi;
+      state.dropAnswers[this.id] = word;
+      // hide token
+      const tok = document.getElementById('tok-' + wi);
+      if (tok) tok.classList.add('used');
+    });
+  });
+
+  // -- Touch Drag --
+  tokens.forEach(tok => {
+    tok.addEventListener('touchstart', function(e) {
+      state.dragActive = { word: this.dataset.word, wi: this.dataset.wi, el: this };
+      this.classList.add('dragging');
+      e.preventDefault();
+    }, { passive: false });
+
+    tok.addEventListener('touchend', function(e) {
+      if (!state.dragActive) return;
+      const touch = e.changedTouches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const zone = target ? target.closest('.drop-zone') : null;
+      if (zone) {
+        returnTokenFromZone(zone);
+        zone.textContent = state.dragActive.word;
+        zone.classList.add('filled');
+        zone.dataset.chosen = state.dragActive.word;
+        zone.dataset.wi = state.dragActive.wi;
+        state.dropAnswers[zone.id] = state.dragActive.word;
+        state.dragActive.el.classList.add('used');
+      }
+      state.dragActive.el.classList.remove('dragging');
+      state.dragActive = null;
+      e.preventDefault();
+    }, { passive: false });
+  });
+}
+
+function returnTokenFromZone(zone) {
+  if (zone.classList.contains('filled')) {
+    const prevWi = zone.dataset.wi;
+    if (prevWi) {
+      const prevTok = document.getElementById('tok-' + prevWi);
+      if (prevTok) prevTok.classList.remove('used');
+    }
+    zone.textContent = '___';
+    zone.classList.remove('filled');
+    delete zone.dataset.chosen;
+    delete zone.dataset.wi;
+    delete state.dropAnswers[zone.id];
+  }
+}
+
+function checkDragAnswer(ex) {
+  let correct = 0;
+  let wrong = 0;
+  ex.sentences.forEach(s => {
+    const zone = document.getElementById(s.id);
+    const chosen = zone ? zone.dataset.chosen : null;
+    if (!zone) return;
+    if (chosen === s.answer) {
+      zone.classList.add('correct-drop');
+      correct++;
+    } else {
+      zone.classList.add('wrong-drop');
+      if (!chosen) zone.textContent = 'x';
+      wrong++;
+    }
+    zone.classList.remove('filled');
+  });
+  const fb = $('fb');
+  fb.classList.add('visible');
+  if (wrong === 0) {
+    state.score++;
+    fb.classList.add('correct');
+    fb.innerHTML = `[OK] <strong>Alles richtig!</strong> Super gemacht!`;
+  } else {
+    fb.classList.add('wrong');
+    let hint = `[X] <strong>${wrong} Fehler.</strong> Richtige Antworten: `;
+    hint += ex.sentences.map(s => `<em>${s.before}</em> <strong>${s.answer}</strong> <em>${s.after}</em>`).join(' | ');
+    fb.innerHTML = hint;
+  }
+  // disable pool
+  document.querySelectorAll('.drag-token').forEach(t => {
+    t.setAttribute('draggable', 'false');
+    t.style.cursor = 'default';
+  });
+}
+
+/* ============================================================
+   CHECK / NEXT
+   ============================================================ */
+function checkAnswer() {
+  if (state.answered) return;
+  state.answered = true;
+  $('btn-ex-check').disabled = true;
+  $('btn-ex-check').style.display = 'none';
+
+  const ex = state.exercises[state.exIdx];
+  if (ex.type === 'mc') checkMCAnswer(ex);
+  else if (ex.type === 'drag') checkDragAnswer(ex);
+
+  // show next or finish
+  if (state.exIdx < state.exercises.length - 1) {
+    $('btn-ex-next').style.display = 'inline-flex';
+    $('btn-ex-next').textContent = 'Nächste Aufgabe ->';
+  } else {
+    $('btn-ex-next').style.display = 'inline-flex';
+    $('btn-ex-next').textContent = 'Ergebnis anzeigen ';
+  }
+}
+
+function nextExercise() {
+  if (state.exIdx < state.exercises.length - 1) {
+    state.exIdx++;
+    renderExercise();
+  } else {
+    showResults();
+  }
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function showResults() {
+  const total = state.exercises.length;
+  const score = state.score;
+  const pct   = Math.round((score / total) * 100);
+
+  $('result-score').textContent = score + ' / ' + total;
+
+  setTimeout(() => {
+    $('result-bar-fill').style.width = pct + '%';
+  }, 100);
+
+  let stars = '';
+  let msg   = '';
+  if (pct >= 90) {
+    stars = '***';
+    msg = 'Fantastisch! Du hast die Quantifiers voll im Griff. Lukas und Emma können die Party entspannt planen! ';
+  } else if (pct >= 60) {
+    stars = '**';
+    msg = 'Gut gemacht! Du verstehst die wichtigsten Regeln schon gut. Noch ein bisschen Übung - und du bist ein Profi!';
+  } else {
+    stars = '*';
+    msg = 'Gut versucht! Schau dir die Regelübersicht nochmal an und versuche es erneut. Du schaffst das! ';
+  }
+  $('result-stars').textContent = stars;
+  $('result-msg').innerHTML = msg;
+
+  showScreen(6);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+updateProgress();
+</script>
+</body>
+</html>
